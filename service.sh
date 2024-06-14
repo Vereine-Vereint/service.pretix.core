@@ -1,5 +1,5 @@
 #!/bin/bash
-SERVICE_NAME="lowercaseservicename"
+SERVICE_NAME="pretix"
 SERVICE_VERSION="v0.1"
 
 set -e
@@ -33,9 +33,9 @@ set +o allexport
 # }
 
 # Configure function that is called before the docker up, start and restart commands
-# att_configure() {
-#   echo "Configuring..."
-# }
+att_configure() {
+  generate templates/pretix.cfg generated/pretix.cfg
+}
 
 # MAIN
 main "$@"

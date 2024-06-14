@@ -4,26 +4,39 @@ networks:
     external: true
 
 services:
-  example:
-    image: whoami
+  pretix:
+    image: pretix/standalone:stable
     restart: unless-stopped
-    # ports:
-    #   - 80:80 # Port of service
+    depends_on:
+      - pretix-db
+      - pretix-redis
     volumes:
-    # use generated folder for generated templates
-    # - ./generated/example:/example:ro # generated template "named example"
-    # use volumes folder for data persistance
-    - ./volumes/test:/test # volume "test" for service
-    env_file:
-    - ../${ENV_FILE} # load selected environment file
-
+      - ./volumes/data:/data
+      - ./generated/pretix.cfg:/etc/pretix/pretix.cfg
+    # ports:
+    #   - "8000:80"
     networks:
-    - traefik # add to traefik network
-    - default # add to default (stack internal) network
+      - traefik
+      - default
 
-    # add labels to connect to traefik
     labels:
       - "traefik.enable=true"
-      #! replace EXAMPLE with your service name
-      - "traefik.http.routers.EXAMPLE.rule=Host(`${EXAMPLE_DOMAIN}`)"
-      - "traefik.http.routers.EXAMPLE.entrypoints=websecure"
+      - "traefik.http.routers.pretix.rule=Host(`${EXAMPLE_DOMAIN}`)"
+      - "traefik.http.routers.pretix.entrypoints=websecure"
+
+  pretix-db:
+    image: postgres:13-alpine3.19
+    restart: unless-stopped
+    # ports:
+    #   - "5432:5432"
+    environment:
+      - POSTGRES_USER=pretix
+      - POSTGRES_PASSWORD=pretix
+    volumes:
+      - ./volumes/db:/var/lib/postgresql/data
+
+  pretix-redis:
+    image: redis:alpine3.19
+    restart: unless-stopped
+    # ports:
+    #   - "6379:6379"

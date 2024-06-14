@@ -1,6 +1,6 @@
-# service.template
+# service.pretix
 
-service for TEMPLATE
+service for pretix
 
 [Documentation of service core](https://github.com/Vereine-Vereint/service.core)
 
