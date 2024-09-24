@@ -12,6 +12,7 @@ services:
       - pretix-redis
     volumes:
       - ./volumes/data:/data
+      - ./volumes/pretix:/etc/pretix
       - ./generated/pretix.cfg:/etc/pretix/pretix.cfg
     # ports:
     #   - "8000:80"
@@ -21,7 +22,7 @@ services:
 
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.pretix.rule=Host(`${EXAMPLE_DOMAIN}`)"
+      - "traefik.http.routers.pretix.rule=Host(`${PRETIX_DOMAIN}`)"
       - "traefik.http.routers.pretix.entrypoints=websecure"
 
   pretix-db:
@@ -31,7 +32,8 @@ services:
     #   - "5432:5432"
     environment:
       - POSTGRES_USER=pretix
-      - POSTGRES_PASSWORD=pretix
+      - POSTGRES_PASSWORD=${PRETIX_DB_PASSWORD}
+      - POSTGRES_DB=pretix
     volumes:
       - ./volumes/db:/var/lib/postgresql/data
 

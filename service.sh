@@ -20,10 +20,15 @@ set +o allexport
 # COMMANDS
 
 # This is an example command that prints a message from the first argument
-# commands+=([example]="<msg>:Example command that prints <msg>")
-# cmd_example() {
-#   echo "Example: $1"
-# }
+commands+=([setup-cron]=":Setup Cronjob for Pretix")
+cmd_setup-cron() {
+  echo "15,45 * * * * /usr/bin/docker exec pretix_pretix pretix cron"
+}
+
+commands+=([run-compress]=":Setup Pretix - Compress")
+cmd_run-compress() {
+  docker compose exec pretix python /pretix/src/manage.py compress
+}
 
 # ATTACHMENTS
 
@@ -34,6 +39,8 @@ set +o allexport
 
 # Configure function that is called before the docker up, start and restart commands
 att_configure() {
+  mkdir -p volumes/data
+  chmod 777 volumes/data
   generate templates/pretix.cfg generated/pretix.cfg
 }
 
