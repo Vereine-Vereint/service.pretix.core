@@ -5,7 +5,7 @@ networks:
 
 services:
   pretix:
-    image: pretix/standalone:stable
+    build: .
     restart: unless-stopped
     depends_on:
       - pretix-db

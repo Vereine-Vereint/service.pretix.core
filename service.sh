@@ -25,23 +25,22 @@ cmd_setup-cron() {
   echo "15,45 * * * * /usr/bin/docker exec pretix_pretix pretix cron"
 }
 
-commands+=([run-compress]=":Setup Pretix - Compress")
-cmd_run-compress() {
-  docker compose exec pretix python /pretix/src/manage.py compress
+# commands+=([run-compress]=":Setup Pretix - Compress")
+# cmd_run-compress() {
+#   docker compose exec pretix python /pretix/src/manage.py compress
+# }
+
+commands+=([exec]=":Execute a command in the pretix container")
+cmd_exec() {
+  docker compose exec -it pretix bash
 }
 
 # ATTACHMENTS
 
-# Setup function that is called before the docker up command
-# att_setup() {
-#   echo "Setting up..."
-# }
-
-# Configure function that is called before the docker up, start and restart commands
-att_configure() {
-  mkdir -p volumes/data
-  chmod 777 volumes/data
-  generate templates/pretix.cfg generated/pretix.cfg
+att_post-setup() {
+  # Setup Pretix - Compress
+  echo "[$SERVICE_NAME] Running compress..."
+  docker compose exec pretix python /pretix/src/manage.py compress
 }
 
 # MAIN
