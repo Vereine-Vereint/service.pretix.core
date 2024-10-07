@@ -1,2 +1,3 @@
 generated
 volumes
+./docker-compose.yml

@@ -5,7 +5,7 @@ networks:
 
 services:
   pretix:
-    build: .
+    ${PRETIX_SOURCE}
     restart: unless-stopped
     depends_on:
       - pretix-db
@@ -22,7 +22,7 @@ services:
 
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.pretix.rule=Host(`${PRETIX_DOMAIN}`)"
+      - "traefik.http.routers.pretix.rule=Host(\`${PRETIX_DOMAIN}\`)"
       - "traefik.http.routers.pretix.entrypoints=websecure"
 
   pretix-db:
