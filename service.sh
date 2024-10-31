@@ -17,10 +17,10 @@ set -o allexport
 set +o allexport
 
 # COMMANDS
-commands+=([setup-cron]=":Setup Cronjob for Pretix")
-cmd_setup-cron() {
-  echo "15,45 * * * * /usr/bin/docker exec pretix_pretix pretix cron"
-}
+# commands+=([setup-cron]=":Setup Cronjob for Pretix")
+# cmd_setup-cron() {
+#   echo "15,45 * * * * /usr/bin/docker exec pretix_pretix pretix cron"
+# }
 
 commands+=([exec]=":Execute a command in the pretix container")
 cmd_exec() {
@@ -39,10 +39,26 @@ att_setup() {
   if [[ -n "$PRETIX_EXTENSIONS" ]]; then
     export PRETIX_SOURCE="build: generated"  
     generate templates/Dockerfile generated/Dockerfile
+    generate templates/pretix.cfg generated/pretix.cfg 
   else
     export PRETIX_SOURCE="image: pretix/standalone:stable"
   fi
   generate templates/docker-compose.yml docker-compose.yml
+}
+
+att_post-start() {
+  echo "[$SERVICE_NAME] Enabling cronjob..."
+  (crontab -l; echo "15,45 * * * * $SERVICE_DIR/service.sh docker exec pretix pretix cron") | crontab -
+  echo "[CRON] Added the following cronjob:"
+  echo "$(crontab -l | grep "$SERVICE_NAME/service.sh")"
+}
+
+att_pre-stop() {
+  echo "[$SERVICE_NAME] Disabling cronjob..."
+  cronjob=$(crontab -l | grep "$SERVICE_DIR/service.sh docker exec")
+  crontab -l | grep -v "$SERVICE_DIR/service.sh docker exec" | crontab -
+  echo "[CRON] Removed the following cronjob:"
+  echo "$cronjob"
 }
 
 att_post-setup() {
